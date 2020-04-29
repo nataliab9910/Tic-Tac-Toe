@@ -2,6 +2,8 @@
 Okno gry, część graficzna projektu
 """
 
+#git test
+
 import pygame
 from game import Game
 
