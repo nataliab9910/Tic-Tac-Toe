@@ -2,13 +2,13 @@
 Konsolowa baza gry
 """
 
+HUMAN, COMPUTER = range(2)
+
 
 class Game:
     """
     Przeprowadza rozgrywkę w konsoli
     """
-
-    actual_player = True  # True - komputer, False - człowiek
 
     def __init__(self):
         """
@@ -17,6 +17,7 @@ class Game:
         self.board = [' ', ' ', ' ',
                       ' ', ' ', ' ',
                       ' ', ' ', ' ']
+        self.current_player = COMPUTER  # podawać, kto jest pierwszym graczem
 
     def print_board(self):
         """
@@ -35,7 +36,7 @@ class Game:
         """
         self.print_board()
 
-        if Game.actual_player:
+        if self.current_player == COMPUTER:
             print("Ruch komputera!")
             self.computers_move()
             self.flip_player()
@@ -45,16 +46,18 @@ class Game:
             self.humans_move()
             self.flip_player()
 
-    @classmethod
-    def flip_player(cls):
+    def flip_player(self):
         """
         Zmienia gracza, który wykonuje ruch
         """
-        cls.actual_player = not cls.actual_player
+        self.current_player = {COMPUTER: HUMAN, HUMAN: COMPUTER}[self.current_player]
 
-    @classmethod
-    def return_actual_player(cls):
-        return cls.actual_player
+    def return_current_player(self):
+        """
+        Zwraca aktualnego gracza
+        :return: HUMAN/COMPUTER (0/1)
+        """
+        return self.current_player == COMPUTER
 
     def computers_move(self):
         """
@@ -62,19 +65,14 @@ class Game:
         :return:
         """
         print("Komputer")
-        Game.flip_player()
+        self.flip_player()
         pass
 
-    def humans_move(self, pos):
+    def humans_move(self):
         """
         Wykonuje ruch gracza
         :return:
         """
         print("Gracz")
-        Game.flip_player()
+        self.flip_player()
         pass
-
-
-# def get_mouse_click(position):
-#     if
-

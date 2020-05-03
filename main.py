@@ -1,10 +1,21 @@
-from window import board_loop
+"""
+Uruchomienie gry
+"""
+
+import window
+import pygame
 
 
 def main():
-    print("Main")
+    """
+    Główna pętla gry
+    """
+    pygame.init()
+    pygame.display.set_caption("TIC-TAC-TOE Game!")
+    game_window = window.Window()
+    game_window.draw_lines()
+    game_window.run()
 
 
 if __name__ == "__main__":
     main()
-    board_loop()

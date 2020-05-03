@@ -2,12 +2,19 @@
 Okno gry, część graficzna projektu
 """
 
-#git test
-
 import pygame
-from game import Game
+import game
 
-SIZE = 450
+BOARD_WIDTH = 450
+BOARD_HEIGHT = 450
+ERROR = -1
+LINES = [((0, int(BOARD_WIDTH / 3)), (BOARD_WIDTH, int(BOARD_WIDTH / 3))),
+         ((0, 2 * int(BOARD_WIDTH / 3)), (BOARD_WIDTH, 2 * int(BOARD_WIDTH / 3))),
+         ((int(BOARD_WIDTH / 3), 0), (int(BOARD_WIDTH / 3), BOARD_WIDTH)),
+         ((2 * int(BOARD_WIDTH / 3), 0), (2 * int(BOARD_WIDTH / 3), BOARD_WIDTH))]
+WINDOW_COLOR = (200, 100, 100)
+LINE_COLOR = (0, 0, 0)
+LINE_WIDTH = 2
 
 
 class Window:
@@ -19,9 +26,8 @@ class Window:
         """
         Konstruktor głównego okna gry
         """
-        self.window = pygame.display.set_mode((SIZE, SIZE))
-        pygame.display.set_caption("Tic-Tac-Toe Game!")
-        self.game = Game()
+        self.window = pygame.display.set_mode((BOARD_WIDTH, BOARD_HEIGHT))
+        self.game = game.Game()
 
     def events(self):
         """
@@ -32,12 +38,14 @@ class Window:
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.game.return_actual_player():
+                if self.game.return_current_player():
                     # jeśli tura komputera - zignoruj kliknięcie
                     continue
                 # sprawdzenie pozycji, ustalenie jej przy pomocy numeru 0-8
                 position = pygame.mouse.get_pos()
                 num_position = Window.position_to_number(position)
+                if num_position == ERROR:
+                    continue
                 self.game.humans_move(num_position)
                 # # Jeśli lewy przycisk - rysuj pionek
                 # if pygame.mouse.get_pressed()[0]:
@@ -48,13 +56,13 @@ class Window:
                 print(position)
         return True
 
-    def run_window(self):
+    def run(self):
         """
         Włączenie i działanie okna gry
         """
         running = True
         while running:
-            if self.game.return_actual_player():
+            if self.game.return_current_player():
                 self.game.computers_move()
             running = self.events()
 
@@ -62,19 +70,11 @@ class Window:
         """
         Rysuje planszę do gry
         """
-        window_color = (200, 100, 100)
-        self.window.fill(window_color)
 
-        lines = [((0, int(SIZE / 3)), (SIZE, int(SIZE / 3))),
-                 ((0, 2 * int(SIZE / 3)), (SIZE, 2 * int(SIZE / 3))),
-                 ((int(SIZE / 3), 0), (int(SIZE / 3), SIZE)),
-                 ((2 * int(SIZE / 3), 0), (2 * int(SIZE / 3), SIZE))]
+        self.window.fill(WINDOW_COLOR)
 
-        line_color = (0, 0, 0)
-        line_width = 2
-
-        for line in lines:
-            pygame.draw.line(self.window, line_color, line[0], line[1], line_width)
+        for line in LINES:
+            pygame.draw.line(self.window, LINE_COLOR, line[0], line[1], LINE_WIDTH)
 
         pygame.display.flip()
 
@@ -88,23 +88,27 @@ class Window:
         pos_width = Window.get_number(pos[0])
         pos_height = Window.get_number(pos[1])
 
+        if ERROR in [pos_width, pos_height]:
+            return ERROR
+
         num_pos = int(3 * pos_height + pos_width)
         print(num_pos)
         return num_pos
 
     @staticmethod
-    def get_number(pos):
+    def get_number(pos, size=BOARD_WIDTH):
         """
         Zmienia pozycję kliknięcia na liczbę od 0 do 2
+        :param size: wymiar siatki
         :param pos: pozycja kliknięcia
         :return: liczba od 0 do 2
         """
-        num = -1
-        if 0 <= pos <= SIZE / 3:
+        num = ERROR
+        if 0 <= pos <= size / 3:
             num = 0
-        elif SIZE / 3 < pos <= (SIZE * 2) / 3:
+        elif size / 3 < pos <= (size * 2) / 3:
             num = 1
-        elif (SIZE * 2) / 3 < pos <= SIZE:
+        elif (size * 2) / 3 < pos <= size:
             num = 2
         return num
 
@@ -123,15 +127,3 @@ class Window:
         :param pos: wybrane pole planszy do usunięcia pionka
         """
         pass
-
-
-def board_loop():
-    """
-    Główna pętla okna gry
-    """
-    print("1")
-    board = Window()
-    print("2")
-    board.draw_lines()
-    print(3)
-    board.run_window()
