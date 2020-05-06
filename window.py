@@ -47,6 +47,7 @@ class Window:
                 if num_position == ERROR:
                     continue
                 self.game.humans_move(num_position)
+                # prawdopodobnie do usunięcia
                 # # Jeśli lewy przycisk - rysuj pionek
                 # if pygame.mouse.get_pressed()[0]:
                 #     Window.left_button(num_position)
@@ -112,18 +113,19 @@ class Window:
             num = 2
         return num
 
-    @staticmethod
-    def left_button(pos):
-        """
-        Umieszcza pionek w wybranym polu planszy
-        :param pos: wybrane pole planszy do umieszczenia pionka
-        """
-        pass
-
-    @staticmethod
-    def right_button(pos):
-        """
-        Usuwa pionek z wybranego pola planszy
-        :param pos: wybrane pole planszy do usunięcia pionka
-        """
-        pass
+    # prawdopodobnie do usunięcia
+    # @staticmethod
+    # def left_button(pos):
+    #     """
+    #     Umieszcza pionek w wybranym polu planszy
+    #     :param pos: wybrane pole planszy do umieszczenia pionka
+    #     """
+    #     pass
+    #
+    # @staticmethod
+    # def right_button(pos):
+    #     """
+    #     Usuwa pionek z wybranego pola planszy
+    #     :param pos: wybrane pole planszy do usunięcia pionka
+    #     """
+    #     pass
