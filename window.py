@@ -2,8 +2,9 @@
 Okno gry, część graficzna projektu
 """
 
+import os
 import pygame
-import game
+import game as g
 
 BOARD_WIDTH = 450
 BOARD_HEIGHT = 450
@@ -16,6 +17,9 @@ WINDOW_COLOR = (200, 100, 100)
 LINE_COLOR = (0, 0, 0)
 LINE_WIDTH = 2
 
+CHECKER_HUMAN = pygame.image.load(os.path.join('.', 'O.png'))
+CHECKER_COMPUTER = pygame.image.load(os.path.join('.', 'X.png'))
+
 
 class Window:
     """
@@ -27,7 +31,7 @@ class Window:
         Konstruktor głównego okna gry
         """
         self.window = pygame.display.set_mode((BOARD_WIDTH, BOARD_HEIGHT))
-        self.game = game.Game()
+        self.game = g.Game()
 
     def events(self):
         """
@@ -47,6 +51,7 @@ class Window:
                 if num_position == ERROR:
                     continue
                 self.game.humans_move(num_position)
+                self.draw_board()
                 # prawdopodobnie do usunięcia
                 # # Jeśli lewy przycisk - rysuj pionek
                 # if pygame.mouse.get_pressed()[0]:
@@ -54,7 +59,7 @@ class Window:
                 # # Jeśli prawy przycisk - usuń pionek
                 # elif pygame.mouse.get_pressed()[2]:
                 #     Window.right_button(num_position)
-                print(position)
+                # print(position)
         return True
 
     def run(self):
@@ -65,9 +70,10 @@ class Window:
         while running:
             if self.game.return_current_player():
                 self.game.computers_move()
+                self.draw_board()
             running = self.events()
 
-    def draw_lines(self):
+    def draw_board(self):
         """
         Rysuje planszę do gry
         """
@@ -76,6 +82,17 @@ class Window:
 
         for line in LINES:
             pygame.draw.line(self.window, LINE_COLOR, line[0], line[1], LINE_WIDTH)
+
+        for pos in range(9):
+            # print(self.game.board[pos])
+            if self.game.board[pos] == g.HUMAN:
+                col, row = Window.number_to_position(pos)
+                # print('hum', row, col)
+                self.window.blit(CHECKER_HUMAN, (col, row))
+            elif self.game.board[pos] == g.COMPUTER:
+                col, row = Window.number_to_position(pos)
+                # print('com', row, col)
+                self.window.blit(CHECKER_COMPUTER, (col, row))
 
         pygame.display.flip()
 
@@ -93,8 +110,20 @@ class Window:
             return ERROR
 
         num_pos = int(3 * pos_height + pos_width)
-        print(num_pos)
+        # print(num_pos)
         return num_pos
+
+    @staticmethod
+    def number_to_position(num):
+        """
+        Zamienia numer pozycji na planszy w konsoli na pozycję w oknie gry
+        :param num: pozycja na planszy w konsoli od 0 do 8
+        :return: współrzędne lewego górnego rogu odpowiedniego pola planszy
+        """
+        pos_width = int(num % 3) * 150
+        pos_height = int(num // 3) * 150
+
+        return pos_width, pos_height
 
     @staticmethod
     def get_number(pos, size=BOARD_WIDTH):

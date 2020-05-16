@@ -3,6 +3,7 @@ Konsolowa baza gry
 """
 
 import time
+# import random
 
 HUMAN, COMPUTER = range(2)
 NO_WINNER = -1
@@ -87,7 +88,6 @@ class Game:
 
         # tablica do sprawdzania kolejnych ustwień pionków
         copy_board = self.board.copy()
-        print("Zaczyna")
         if count_checkers(copy_board, COMPUTER) >= 3:
             # usuwa pionek, potem dodaje
             while all_waiting + actual_waiting * rate < MAX_WAITING_TIME and best_score < WIN_SCORE:
@@ -113,6 +113,9 @@ class Game:
                 else:
                     rate = 1
                 depth += 1
+            # t = random.randint(3, 6)
+            # if all_waiting < t:
+            #     time.sleep(t - all_waiting)
             self.board[best_remove_pos] = EMPTY
             self.board[best_add_pos] = COMPUTER
         else:
@@ -135,6 +138,9 @@ class Game:
                 else:
                     rate = 1
                 depth += 1
+            # t = random.randint(2, 5)
+            # if all_waiting < t:
+            #     time.sleep(t - all_waiting)
             self.board[best_add_pos] = COMPUTER
         ###
         print("Depth = ", depth, sep='')
