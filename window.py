@@ -6,6 +6,8 @@ import pygame
 
 import game as g
 
+# pygame.init()
+
 BOARD_WIDTH = 450
 BOARD_HEIGHT = 450
 
@@ -19,6 +21,8 @@ LINES = [((0, int(BOARD_WIDTH / 3)), (BOARD_WIDTH, int(BOARD_WIDTH / 3))),
 WINDOW_COLOR = pygame.Color("salmon")
 LINE_COLOR = pygame.Color("black")
 LINE_WIDTH = 2
+# FONT = pygame.font.Font('freesansbold.ttf', 32)
+# FONT2 = pygame.font.Font('freesansbold.ttf', 16)
 
 CHECKER_HUMAN = pygame.image.load(os.path.join('.', 'O.png'))
 CHECKER_COMPUTER = pygame.image.load(os.path.join('.', 'X.png'))
@@ -31,7 +35,7 @@ class Window:
 
     def __init__(self):
         """Konstruktor głównego okna gry."""
-        self.window = pygame.display.set_mode((BOARD_WIDTH, BOARD_HEIGHT))
+        self.window = pygame.display.set_mode((BOARD_WIDTH, BOARD_HEIGHT + 50))
         self.game = g.Game()
 
     def events(self):
@@ -46,13 +50,17 @@ class Window:
                 if self.game.current_player == g.COMPUTER:
                     # jeśli tura komputera - zignoruj kliknięcie
                     continue
-                # sprawdzenie pozycji, ustalenie jej przy pomocy numeru 0-8
-                position = pygame.mouse.get_pos()
-                num_position = Window.position_to_number(position)
-                if num_position == ERROR:
-                    continue
-                self.game.humans_move(num_position)
-                self.draw_board()
+                elif self.game.current_player == g.HUMAN:
+                    # sprawdzenie pozycji, ustalenie jej przy pomocy numeru 0-8
+                    position = pygame.mouse.get_pos()
+                    num_position = Window.position_to_number(position)
+                    if num_position == ERROR:
+                        continue
+                    self.game.humans_move(num_position)
+                    self.draw_board()
+                elif self.game.current_player not in (g.COMPUTER, g.HUMAN):
+                    self.game.reset()
+                    self.draw_board()
                 # prawdopodobnie do usunięcia
                 # # Jeśli lewy przycisk - rysuj pionek
                 # if pygame.mouse.get_pressed()[0]:
@@ -70,6 +78,21 @@ class Window:
             if self.game.current_player == g.COMPUTER:
                 self.game.computers_move()
                 self.draw_board()
+            elif self.game.current_player == g.COMPUTER + 2:
+                FONT = pygame.font.Font('freesansbold.ttf', 32)
+                text = FONT.render('Wygrywa komputer!', True, WINDOW_COLOR, LINE_COLOR)
+                textRect = text.get_rect()
+                textRect.center = (int(BOARD_WIDTH//2), int(BOARD_WIDTH//2))
+                self.window.blit(text, textRect)
+                pygame.display.update()
+            elif self.game.current_player == g.HUMAN + 2:
+                FONT = pygame.font.Font('freesansbold.ttf', 32)
+                text = FONT.render('Wygrywasz! Gratulacje!', True, WINDOW_COLOR,
+                                   LINE_COLOR)
+                textRect = text.get_rect()
+                textRect.center = (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2))
+                self.window.blit(text, textRect)
+                pygame.display.update()
             running = self.events()
 
     def draw_board(self):
@@ -90,6 +113,20 @@ class Window:
                 col, row = Window.number_to_position(pos)
                 # print('com', row, col)
                 self.window.blit(CHECKER_COMPUTER, (col, row))
+
+        if self.game.current_player == g.COMPUTER:
+            text = 'Ruch komputera'
+        elif self.game.current_player == g.HUMAN:
+            text = 'Twój ruch'
+        else:
+            text = 'Kliknij na planszę, aby zagrać ponownie.'
+        FONT2 = pygame.font.Font('freesansbold.ttf', 16)
+        text = FONT2.render(text, True, LINE_COLOR,
+                           WINDOW_COLOR)
+        textRect = text.get_rect()
+        textRect.center = (BOARD_WIDTH // 2, BOARD_WIDTH + 25)
+        self.window.blit(text, textRect)
+        pygame.display.update()
 
         pygame.display.flip()
 

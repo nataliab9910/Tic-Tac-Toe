@@ -2,7 +2,7 @@
 
 import time
 
-# import random
+import random
 
 BOARD = [' ', ' ', ' ',
          ' ', ' ', ' ',
@@ -80,6 +80,9 @@ class Game:
         all_waiting = actual_waiting = previous_waiting = expected_waiting = 0
         rate = 1
 
+        # TO-DO: mieszanie list z dostępnymi pozycjami,
+        # żeby rozgrywki różniły się od siebie
+
         # tablica do sprawdzania kolejnych ustwień pionków
         copy_board = self.board[:]
         if count_checkers(copy_board, COMPUTER) >= 3:
@@ -119,8 +122,11 @@ class Game:
             # dodaje pionek
             while expected_waiting < MAX_WAITING_SEC and best_score < WIN_SCORE:
                 start_timer = time.time()
-                for add_pos in [pos for pos in range(9) if
-                                copy_board[pos] == EMPTY]:
+                ### TO-DO
+                tab = [pos for pos in range(9) if
+                                copy_board[pos] == EMPTY]
+                for add_pos in random.sample(tab, len(tab)):
+                    ###
                     copy_board[add_pos] = COMPUTER
                     score = minimax(depth, copy_board, HUMAN) + depth
                     if score > best_score:
@@ -144,8 +150,15 @@ class Game:
         ###
         print("Depth = ", depth, sep='')
         ###
-        self.flip_player()
         self.print_board()
+
+        win = check_winner(self.board)
+        if win != NO_WINNER:
+            self.current_player = win + 2
+            print('Wygrywa komputer!')
+            return
+
+        self.flip_player()
 
     def humans_move(self, position):
         """Wykonuje ruch gracza.
@@ -168,7 +181,20 @@ class Game:
                 break
 
         self.print_board()
+
+        win = check_winner(self.board)
+        if win != NO_WINNER:
+            self.current_player = win + 2
+            print('Wygrywasz!')
+            return
+
         self.flip_player()
+
+    def reset(self):
+        """Resetuje grę, aby rozgrywka mogła zacząć się od nowa."""
+        self.board = BOARD[:]
+        self.current_player = COMPUTER
+        print('Nowa gra')
 
 
 def count_checkers(board, checker):
