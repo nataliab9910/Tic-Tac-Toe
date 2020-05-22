@@ -1,48 +1,49 @@
-"""
-Okno gry, część graficzna projektu
-"""
+"""Część graficzna projektu, określa działania na oknie gry."""
 
 import os
+
 import pygame
+
 import game as g
 
 BOARD_WIDTH = 450
 BOARD_HEIGHT = 450
-ERROR = -1
+
 LINES = [((0, int(BOARD_WIDTH / 3)), (BOARD_WIDTH, int(BOARD_WIDTH / 3))),
-         ((0, 2 * int(BOARD_WIDTH / 3)), (BOARD_WIDTH, 2 * int(BOARD_WIDTH / 3))),
+         ((0, 2 * int(BOARD_WIDTH / 3)),
+          (BOARD_WIDTH, 2 * int(BOARD_WIDTH / 3))),
          ((int(BOARD_WIDTH / 3), 0), (int(BOARD_WIDTH / 3), BOARD_WIDTH)),
-         ((2 * int(BOARD_WIDTH / 3), 0), (2 * int(BOARD_WIDTH / 3), BOARD_WIDTH))]
-WINDOW_COLOR = (200, 100, 100)
-LINE_COLOR = (0, 0, 0)
+         ((2 * int(BOARD_WIDTH / 3), 0),
+          (2 * int(BOARD_WIDTH / 3), BOARD_WIDTH))]
+
+WINDOW_COLOR = pygame.Color("salmon")
+LINE_COLOR = pygame.Color("black")
 LINE_WIDTH = 2
 
 CHECKER_HUMAN = pygame.image.load(os.path.join('.', 'O.png'))
 CHECKER_COMPUTER = pygame.image.load(os.path.join('.', 'X.png'))
 
+ERROR = -1
+
 
 class Window:
-    """
-    Główne okno gry z planszą
-    """
+    """Implementuje główne okno gry z planszą."""
 
     def __init__(self):
-        """
-        Konstruktor głównego okna gry
-        """
+        """Konstruktor głównego okna gry."""
         self.window = pygame.display.set_mode((BOARD_WIDTH, BOARD_HEIGHT))
         self.game = g.Game()
 
     def events(self):
-        """
-        Obsługa kliknięć myszką
-        :return: False gdy nastąpiło wyjście z gry, True w pozostałych przypadkach
+        """Obsługuje kliknięcia myszką.
+
+        :return: False - nastąpiło wyjście z gry, jeśli nie - True.
         """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.game.return_current_player():
+                if self.game.current_player == g.COMPUTER:
                     # jeśli tura komputera - zignoruj kliknięcie
                     continue
                 # sprawdzenie pozycji, ustalenie jej przy pomocy numeru 0-8
@@ -63,25 +64,21 @@ class Window:
         return True
 
     def run(self):
-        """
-        Włączenie i działanie okna gry
-        """
+        """Określa działanie okna gry."""
         running = True
         while running:
-            if self.game.return_current_player():
+            if self.game.current_player == g.COMPUTER:
                 self.game.computers_move()
                 self.draw_board()
             running = self.events()
 
     def draw_board(self):
-        """
-        Rysuje planszę do gry
-        """
-
+        """Rysuje planszę do gry."""
         self.window.fill(WINDOW_COLOR)
 
         for line in LINES:
-            pygame.draw.line(self.window, LINE_COLOR, line[0], line[1], LINE_WIDTH)
+            pygame.draw.line(self.window, LINE_COLOR, line[0], line[1],
+                             LINE_WIDTH)
 
         for pos in range(9):
             # print(self.game.board[pos])
@@ -98,10 +95,10 @@ class Window:
 
     @staticmethod
     def position_to_number(pos):
-        """
-        Zamienia pozycję kliknięcia myszką na pole planszy numerowane od 0 do 8
-        :param pos: miejsce, w które kliknęliśmy myszką w postaci (szerokość, wysokość)
-        :return: liczba od 0 do 8 oznaczająca wybrane pole planszy
+        """Zamienia pozycję kliknięcia na pole planszy numerowane od 0 do 8.
+
+        :param pos: pozycja kliknięcia w postaci (szerokość, wysokość).
+        :return: liczba od 0 do 8, oznaczająca wybrane pole planszy.
         """
         pos_width = Window.get_number(pos[0])
         pos_height = Window.get_number(pos[1])
@@ -115,10 +112,10 @@ class Window:
 
     @staticmethod
     def number_to_position(num):
-        """
-        Zamienia numer pozycji na planszy w konsoli na pozycję w oknie gry
-        :param num: pozycja na planszy w konsoli od 0 do 8
-        :return: współrzędne lewego górnego rogu odpowiedniego pola planszy
+        """Zamienia numer pozycji na planszy w konsoli na pozycję w oknie gry.
+
+        :param num: pozycja na planszy w konsoli, od 0 do 8.
+        :return: współrzędne lewego górnego rogu pola planszy w oknie gry.
         """
         pos_width = int(num % 3) * 150
         pos_height = int(num // 3) * 150
@@ -127,11 +124,11 @@ class Window:
 
     @staticmethod
     def get_number(pos, size=BOARD_WIDTH):
-        """
-        Zmienia pozycję kliknięcia na liczbę od 0 do 2
-        :param size: wymiar siatki
-        :param pos: pozycja kliknięcia
-        :return: liczba od 0 do 2
+        """Zmienia pozycję kliknięcia na liczbę od 0 do 2.
+
+        :param size: wymiar siatki.
+        :param pos: pozycja kliknięcia.
+        :return: liczba od 0 do 2.
         """
         num = ERROR
         if 0 <= pos <= size / 3:

@@ -1,15 +1,13 @@
-"""
-Uruchomienie gry
-"""
+"""Uruchamia grę Tic-Tac-Toe."""
+
+import pygame
 
 import window
-import pygame
 
 
 def main():
-    """
-    Główna pętla gry
-    """
+    """Wykonuje główną pętlę gry."""
+
     pygame.init()
     pygame.display.set_caption("TIC-TAC-TOE Game!")
     game_window = window.Window()
