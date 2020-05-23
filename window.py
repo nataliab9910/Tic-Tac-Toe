@@ -60,6 +60,7 @@ class Window:
                     self.draw_board()
                 elif self.game.current_player not in (g.COMPUTER, g.HUMAN):
                     self.game.reset()
+                    self.first_player()
                     self.draw_board()
                 # prawdopodobnie do usunięcia
                 # # Jeśli lewy przycisk - rysuj pionek
@@ -80,9 +81,10 @@ class Window:
                 self.draw_board()
             elif self.game.current_player == g.COMPUTER + 2:
                 FONT = pygame.font.Font('freesansbold.ttf', 32)
-                text = FONT.render('Wygrywa komputer!', True, WINDOW_COLOR, LINE_COLOR)
+                text = FONT.render('Wygrywa komputer!', True, WINDOW_COLOR,
+                                   LINE_COLOR)
                 textRect = text.get_rect()
-                textRect.center = (int(BOARD_WIDTH//2), int(BOARD_WIDTH//2))
+                textRect.center = (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2))
                 self.window.blit(text, textRect)
                 pygame.display.update()
             elif self.game.current_player == g.HUMAN + 2:
@@ -122,13 +124,52 @@ class Window:
             text = 'Kliknij na planszę, aby zagrać ponownie.'
         FONT2 = pygame.font.Font('freesansbold.ttf', 16)
         text = FONT2.render(text, True, LINE_COLOR,
-                           WINDOW_COLOR)
+                            WINDOW_COLOR)
         textRect = text.get_rect()
         textRect.center = (BOARD_WIDTH // 2, BOARD_WIDTH + 25)
         self.window.blit(text, textRect)
         pygame.display.update()
 
         pygame.display.flip()
+
+    def first_player(self):
+        self.window.fill(WINDOW_COLOR)
+        FONT = pygame.font.Font('freesansbold.ttf', 35)
+        text = FONT.render('Kto zaczyna?', True, LINE_COLOR,
+                            WINDOW_COLOR)
+        textRect = text.get_rect()
+        textRect.center = (BOARD_WIDTH/2, 100)
+        self.window.blit(text, textRect)
+        FONT = pygame.font.Font('freesansbold.ttf', 25)
+        text1 = FONT.render('JA', True, LINE_COLOR,
+                            WINDOW_COLOR)
+        textRect = text1.get_rect()
+        textRect.center = (125, 320)
+        self.window.blit(text1, textRect)
+        self.window.blit(CHECKER_HUMAN, (50, 150))
+        text2 = FONT.render('KOMPUTER', True, LINE_COLOR,
+                            WINDOW_COLOR)
+        textRect2 = text2.get_rect()
+        textRect2.center = (325, 320)
+        self.window.blit(text2, textRect2)
+        self.window.blit(CHECKER_COMPUTER,
+                         (250, 150))
+        pygame.display.update()
+
+        pygame.display.flip()
+
+        choosen = False
+        while not choosen:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit(0)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    position = pygame.mouse.get_pos()
+                    if position[0] < BOARD_WIDTH / 2:
+                        self.game.current_player = g.HUMAN
+                    else:
+                        self.game.current_player = g.COMPUTER
+                    choosen = True
 
     @staticmethod
     def position_to_number(pos):

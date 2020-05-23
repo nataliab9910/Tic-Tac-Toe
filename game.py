@@ -193,8 +193,12 @@ class Game:
     def reset(self):
         """Resetuje grę, aby rozgrywka mogła zacząć się od nowa."""
         self.board = BOARD[:]
-        self.current_player = COMPUTER
+        # self.current_player = COMPUTER
         print('Nowa gra')
+
+    # def choose_first_player(self, choosen_player):
+    #     self.current_player = choosen_player
+
 
 
 def count_checkers(board, checker):
