@@ -19,16 +19,38 @@ LINES = [((0, int(BOARD_WIDTH / 3)), (BOARD_WIDTH, int(BOARD_WIDTH / 3))),
           (2 * int(BOARD_WIDTH / 3), BOARD_WIDTH))]
 LINE_WIDTH = 2
 
-COLORS = {'SALMON': pygame.Color("salmon"), 'BLACK': pygame.Color("black")}
-CHECKERS = {'HUMAN': pygame.image.load(os.path.join('.', 'O.png')),
-            'COMPUTER': pygame.image.load(os.path.join('.', 'X.png'))}
-CHECKER_WIDTH = 150
-CHECKER_HEIGHT = 150
-
-FONT_STYLE = 'freesansbold.ttf'
-FONT_SIZES = {'SMALL': 21, 'MEDIUM': 25, 'BIG': 31, 'LARGE': 35}
-
 ERROR = -1
+
+
+class CHECKER:
+    """Pionki."""
+
+    # pylint: disable=too-few-public-methods
+    HUMAN = pygame.image.load(os.path.join('.', 'O.png'))
+    COMPUTER = pygame.image.load(os.path.join('.', 'X.png'))
+
+    WIDTH = 150
+    HEIGHT = 150
+
+
+class COLORS:
+    """Paleta barw."""
+
+    # pylint: disable=too-few-public-methods
+    SALMON = pygame.Color("salmon")
+    BLACK = pygame.Color("black")
+
+
+class FONT:
+    """Czcionki."""
+
+    # pylint: disable=too-few-public-methods
+    SMALL = 21
+    MEDIUM = 25
+    BIG = 31
+    LARGE = 35
+
+    STYLE = 'freesansbold.ttf'
 
 
 class Window:
@@ -57,13 +79,13 @@ class Window:
             self.draw_board()
 
             if self.game.current_player == g.COMPUTER_WIN:
-                self.show_text(' Wygrywa komputer! ', FONT_SIZES['BIG'],
+                self.show_text(' Wygrywa komputer! ', FONT.BIG,
                                (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2)),
-                               (COLORS['SALMON'], COLORS['BLACK']))
+                               (COLORS.SALMON, COLORS.BLACK))
             elif self.game.current_player == g.HUMAN_WIN:
-                self.show_text(' Wygrywasz! Gratulacje! ', FONT_SIZES['BIG'],
+                self.show_text(' Wygrywasz! Gratulacje! ', FONT.BIG,
                                (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2)),
-                               (COLORS['SALMON'], COLORS['BLACK']))
+                               (COLORS.SALMON, COLORS.BLACK))
             pygame.display.update()
 
             if self.game.current_player not in (g.COMPUTER, g.HUMAN):
@@ -75,19 +97,19 @@ class Window:
     def draw_board(self):
         """Rysuje planszę do gry."""
 
-        self.window.fill(COLORS['SALMON'])
+        self.window.fill(COLORS.SALMON)
 
         for line in LINES:
-            pygame.draw.line(self.window, COLORS['BLACK'], line[0], line[1],
+            pygame.draw.line(self.window, COLORS.BLACK, line[0], line[1],
                              LINE_WIDTH)
 
         for pos in range(9):
             if self.game.board[pos] == g.HUMAN:
                 column, row = Window.number_to_position(pos)
-                self.window.blit(CHECKERS['HUMAN'], (column, row))
+                self.window.blit(CHECKER.HUMAN, (column, row))
             elif self.game.board[pos] == g.COMPUTER:
                 column, row = Window.number_to_position(pos)
-                self.window.blit(CHECKERS['COMPUTER'], (column, row))
+                self.window.blit(CHECKER.COMPUTER, (column, row))
 
         if self.game.current_player == g.COMPUTER:
             text = 'Ruch komputera'
@@ -95,7 +117,7 @@ class Window:
             text = 'Twój ruch'
         else:
             text = 'Kliknij na planszę, aby zagrać ponownie.'
-        self.show_text(text, FONT_SIZES['SMALL'],
+        self.show_text(text, FONT.SMALL,
                        (BOARD_WIDTH // 2, BOARD_WIDTH + 25))
 
         pygame.display.flip()
@@ -103,19 +125,19 @@ class Window:
     def first_player(self):
         """Tworzy widok wyboru, kto zaczyna grę i ustawia pierwszego gracza."""
 
-        self.window.fill(COLORS['SALMON'])
+        self.window.fill(COLORS.SALMON)
 
-        self.show_text('Kto zaczyna?', FONT_SIZES['LARGE'],
+        self.show_text('Kto zaczyna?', FONT.LARGE,
                        (BOARD_WIDTH / 2, (BOARD_HEIGHT + TEXT_AREA_HEIGHT) / 5))
-        self.show_text('JA', FONT_SIZES['MEDIUM'], (
-            (BOARD_WIDTH / 4), BOARD_HEIGHT / 3 + CHECKER_HEIGHT + 20))
-        self.show_text('KOMPUTER', FONT_SIZES['MEDIUM'], (
-            (BOARD_WIDTH / 4) * 3, BOARD_HEIGHT / 3 + CHECKER_HEIGHT + 20))
+        self.show_text('JA', FONT.MEDIUM, (
+            (BOARD_WIDTH / 4), BOARD_HEIGHT / 3 + CHECKER.HEIGHT + 20))
+        self.show_text('KOMPUTER', FONT.MEDIUM, (
+            (BOARD_WIDTH / 4) * 3, BOARD_HEIGHT / 3 + CHECKER.HEIGHT + 20))
 
-        self.window.blit(CHECKERS['HUMAN'], (
-            BOARD_WIDTH / 4 - CHECKER_WIDTH / 2, BOARD_HEIGHT / 3))
-        self.window.blit(CHECKERS['COMPUTER'], (
-            (BOARD_WIDTH / 4) * 3 - CHECKER_WIDTH / 2, BOARD_HEIGHT / 3))
+        self.window.blit(CHECKER.HUMAN, (
+            BOARD_WIDTH / 4 - CHECKER.WIDTH / 2, BOARD_HEIGHT / 3))
+        self.window.blit(CHECKER.COMPUTER, (
+            (BOARD_WIDTH / 4) * 3 - CHECKER.WIDTH / 2, BOARD_HEIGHT / 3))
         pygame.display.update()
 
         position = Window.event()
@@ -125,7 +147,7 @@ class Window:
             self.game.current_player = g.COMPUTER
 
     def show_text(self, text, size, position,
-                  colors=(COLORS['BLACK'], COLORS['SALMON'])):
+                  colors=(COLORS.BLACK, COLORS.SALMON)):
         """Wypisuje tekst w oknie gry.
 
         :param text: tekst do wypisania,
@@ -134,7 +156,7 @@ class Window:
         :param colors: kolor tekstu i tła, domyślnie (BLACK, SALMON).
         """
 
-        font = pygame.font.Font(FONT_STYLE, size)
+        font = pygame.font.Font(FONT.STYLE, size)
         text = font.render(text, True, colors[0], colors[1])
         text_rect = text.get_rect()
         text_rect.center = position
