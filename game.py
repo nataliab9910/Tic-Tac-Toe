@@ -8,7 +8,7 @@ BOARD = [' ', ' ', ' ',
          ' ', ' ', ' ',
          ' ', ' ', ' ']
 
-HUMAN, COMPUTER = range(2)
+HUMAN, COMPUTER, HUMAN_WIN, COMPUTER_WIN = range(4)
 EMPTY = ' '
 
 NO_WINNER = -1
@@ -25,46 +25,25 @@ class Game:
     """Przeprowadza rozgrywkę w konsoli."""
 
     def __init__(self):
-        """Tworzy tablicę rozgrywki w konsoli i główne okno gry"""
+        """Tworzy tablicę rozgrywki w konsoli i główne okno gry."""
+
         self.board = BOARD[:]
         self.current_player = COMPUTER
 
     def print_board(self):
         """Rysuje planszę w konsoli."""
+
         for i in range(3):
             print(f' {self.board[3 * i]} | {self.board[1 + 3 * i]} | '
                   f'{self.board[2 + 3 * i]}')
             if i < 2:
                 print('---+---+---')
 
-    # prawdopodobnie do usunięcia
-    # def make_move(self):
-    #     """
-    #     Wykonanie ruchu przez aktualnego gracza
-    #     """
-    #     self.print_board()
-    #
-    #     if self.current_player == COMPUTER:
-    #         print("Ruch komputera!")
-    #         self.computers_move()
-    #         self.flip_player()
-    #
-    #     else:
-    #         print("Twój ruch!")
-    #         self.humans_move()
-    #         self.flip_player()
-
     def flip_player(self):
         """Zmienia gracza, który wykonuje ruch."""
+
         self.current_player = {COMPUTER: HUMAN, HUMAN: COMPUTER}[
             self.current_player]
-
-    # def return_current_player(self):
-    #     """
-    #     Zwraca aktualnego gracza
-    #     :return: HUMAN/COMPUTER (0/1)
-    #     """
-    #     return self.current_player == COMPUTER
 
     def computers_move(self):
         """Wykonuje ruch komputera.
@@ -154,7 +133,7 @@ class Game:
 
         win = check_winner(self.board)
         if win != NO_WINNER:
-            self.current_player = win + 2
+            self.current_player = COMPUTER_WIN
             print('Wygrywa komputer!')
             return
 
@@ -184,7 +163,7 @@ class Game:
 
         win = check_winner(self.board)
         if win != NO_WINNER:
-            self.current_player = win + 2
+            self.current_player = HUMAN_WIN
             print('Wygrywasz!')
             return
 
@@ -200,14 +179,14 @@ class Game:
     #     self.current_player = choosen_player
 
 
-
 def count_checkers(board, checker):
     """Liczy pionki danego gracza.
 
-    :param board: plansza gry.
-    :param checker: jakie pionki liczyć.
+    :param board: plansza gry,
+    :param checker: jakie pionki liczyć,
     :return: liczba pionków danego gracza.
     """
+
     number_of_checkers = 0
     for i in range(0, 9):
         if board[i] == checker:
@@ -218,11 +197,12 @@ def count_checkers(board, checker):
 def minimax(depth, board, next_player):
     """Ocenia możliwe ruchy komputera tak, aby móc wyłonić ten najlepszy.
 
-    :param depth: maksymalna głębokość, na której będzie sprawdzał kombinacje.
-    :param board: plansza gry.
-    :param next_player: gracz, który będzie wykonywał następny ruch.
+    :param depth: maksymalna głębokość, na której będzie sprawdzał kombinacje,
+    :param board: plansza gry,
+    :param next_player: gracz, który będzie wykonywał następny ruch,
     :return: ocena ruchu komputera.
     """
+
     if depth == 0 or check_winner(board) != NO_WINNER:
         return evaluate(board)
 
@@ -246,13 +226,14 @@ def minimax(depth, board, next_player):
 def minimax_add(depth, board, next_player, evaluation, remove_pos=-1):
     """Szuka najlepszego miejsca na planszy na dodanie pionka komputera.
 
-    :param depth: maksymalna głębokość, na której będzie sprawdzał kombinacje.
-    :param board: plansza gry.
-    :param next_player: gracz, który będzie wykonywał następny ruch.
-    :param evaluation: aktualna ocena ruchu.
-    :param remove_pos: miejsce, z którego w tym samym ruchu usunięto pionek.
+    :param depth: maksymalna głębokość, na której będzie sprawdzał kombinacje,
+    :param board: plansza gry,
+    :param next_player: gracz, który będzie wykonywał następny ruch,
+    :param evaluation: aktualna ocena ruchu,
+    :param remove_pos: miejsce, z którego w tym samym ruchu usunięto pionek,
     :return: uaktualniona ocena ruchu.
     """
+
     for add_pos in [pos for pos in range(9) if
                     board[pos] == EMPTY and pos != remove_pos]:
         board[add_pos] = next_player
@@ -271,11 +252,12 @@ def minimax_add(depth, board, next_player, evaluation, remove_pos=-1):
 def evaluate(board):
     """Ocenia aktualny stan gry z punktu widzenia komputera.
 
-    :param board: plansza z aktualnym stanem gry.
+    :param board: plansza z aktualnym stanem gry,
     :return: informacja o wygranej: WIN_SCORE - komputer,
                                     LOSE_SCORE - człowiek,
                                     NO_WINNER - nikt.
     """
+
     if check_winner(board) == COMPUTER:
         score = WIN_SCORE
     elif check_winner(board) == HUMAN:
@@ -290,9 +272,10 @@ def remove_checker(board, position):
 
     Jeśli na danej pozycji planszy nie ma właściwego pionka, wypisuje
     informację o źle wybranej pozycji i nie zmienia stanu planszy.
-    :param board: plansza gry.
+    :param board: plansza gry,
     :param position: pozycja, z której chcemy usunąć pionek.
     """
+
     if board[position] == HUMAN:
         board[position] = 'r'
     else:
@@ -305,10 +288,11 @@ def add_checker(board, position):
     Jeśli wybrana pozycja nie jest pusta lub w tym samym ruchu gracz usunął
     z niej pionek, wypisuje informację o źle wybranej pozycji, zwraca błąd
     i nie zmienia stanu planszy.
-    :param board: plansza gry.
-    :param position: pozycja, na której chcemy ustawić pionek.
+    :param board: plansza gry,
+    :param position: pozycja, na której chcemy ustawić pionek,
     :return: SUCCESS - wybrano właściwą pozycję, ERROR - w przeciwnym przypadku.
     """
+
     if board[position] == 'r':
         print('Nie możesz postawić pionka w to samo miejsce, '
               'z którego go usunąłęś.')
@@ -325,9 +309,10 @@ def add_checker(board, position):
 def check_winner(board):
     """Sprawdza, czy ktoś ułożył zwycięską kombinację.
 
-    :param board: plansza gry.
+    :param board: plansza gry,
     :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
     """
+
     winner = check_columns(board)
     if winner == NO_WINNER:
         winner = check_rows(board)
@@ -339,9 +324,10 @@ def check_winner(board):
 def check_columns(board):
     """Sprawdza, czy w kolumnie została ułożona zwycięska kombinacja.
 
-    :param board: plansza gry.
+    :param board: plansza gry,
     :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
     """
+
     for i in range(0, 3):
         if board[i] == board[3 + i] == board[6 + i] != EMPTY:
             return board[i]
@@ -351,9 +337,10 @@ def check_columns(board):
 def check_rows(board):
     """Sprawdza, czy w rzędzie została ułożona zwycięska kombinacja.
 
-    :param board: plansza gry.
+    :param board: plansza gry,
     :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
     """
+
     for i in range(0, 3):
         if board[3 * i] == board[1 + 3 * i] == board[2 + 3 * i] != EMPTY:
             return board[3 * i]
@@ -363,9 +350,10 @@ def check_rows(board):
 def check_diagonals(board):
     """Sprawdza czy na przekątnej została ułożona zwycięska kombinacja.
 
-    :param board: plansza gry.
+    :param board: plansza gry,
     :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
     """
+
     if board[0] == board[4] == board[8] != EMPTY:
         return board[0]
     if board[2] == board[4] == board[6] != EMPTY:
