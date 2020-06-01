@@ -1,6 +1,5 @@
 """Część graficzna projektu, określa działania na oknie gry."""
 
-import os
 import sys
 
 import pygame
@@ -11,12 +10,14 @@ BOARD_WIDTH = 450
 BOARD_HEIGHT = 450
 TEXT_AREA_HEIGHT = 50
 
-LINES = [((0, int(BOARD_WIDTH / 3)), (BOARD_WIDTH, int(BOARD_WIDTH / 3))),
-         ((0, 2 * int(BOARD_WIDTH / 3)),
-          (BOARD_WIDTH, 2 * int(BOARD_WIDTH / 3))),
-         ((int(BOARD_WIDTH / 3), 0), (int(BOARD_WIDTH / 3), BOARD_WIDTH)),
-         ((2 * int(BOARD_WIDTH / 3), 0),
-          (2 * int(BOARD_WIDTH / 3), BOARD_WIDTH))]
+LINES = [((0, int(BOARD_WIDTH / g.FIELDS_IN_ROW)),
+          (BOARD_WIDTH, int(BOARD_WIDTH / g.FIELDS_IN_ROW))),
+         ((0, 2 * int(BOARD_WIDTH / g.FIELDS_IN_ROW)),
+          (BOARD_WIDTH, 2 * int(BOARD_WIDTH / g.FIELDS_IN_ROW))),
+         ((int(BOARD_WIDTH / g.FIELDS_IN_ROW), 0),
+          (int(BOARD_WIDTH / g.FIELDS_IN_ROW), BOARD_WIDTH)),
+         ((2 * int(BOARD_WIDTH / g.FIELDS_IN_ROW), 0),
+          (2 * int(BOARD_WIDTH / g.FIELDS_IN_ROW), BOARD_WIDTH))]
 LINE_WIDTH = 2
 
 ERROR = -1
@@ -26,8 +27,8 @@ class CHECKER:
     """Pionki."""
 
     # pylint: disable=too-few-public-methods
-    HUMAN = pygame.image.load(os.path.join('.', 'O.png'))
-    COMPUTER = pygame.image.load(os.path.join('.', 'X.png'))
+    HUMAN = pygame.image.load('O.png')
+    COMPUTER = pygame.image.load('X.png')
 
     WIDTH = 150
     HEIGHT = 150
@@ -103,7 +104,7 @@ class Window:
             pygame.draw.line(self.window, COLORS.BLACK, line[0], line[1],
                              LINE_WIDTH)
 
-        for pos in range(9):
+        for pos in range(g.FIELDS_IN_BOARD):
             if self.game.board[pos] == g.HUMAN:
                 column, row = Window.number_to_position(pos)
                 self.window.blit(CHECKER.HUMAN, (column, row))
@@ -130,14 +131,17 @@ class Window:
         self.show_text('Kto zaczyna?', FONT.LARGE,
                        (BOARD_WIDTH / 2, (BOARD_HEIGHT + TEXT_AREA_HEIGHT) / 5))
         self.show_text('JA', FONT.MEDIUM, (
-            (BOARD_WIDTH / 4), BOARD_HEIGHT / 3 + CHECKER.HEIGHT + 20))
+            (BOARD_WIDTH / 4),
+            BOARD_HEIGHT / g.FIELDS_IN_ROW + CHECKER.HEIGHT + 20))
         self.show_text('KOMPUTER', FONT.MEDIUM, (
-            (BOARD_WIDTH / 4) * 3, BOARD_HEIGHT / 3 + CHECKER.HEIGHT + 20))
+            (BOARD_WIDTH / 4) * g.FIELDS_IN_ROW,
+            BOARD_HEIGHT / g.FIELDS_IN_ROW + CHECKER.HEIGHT + 20))
 
-        self.window.blit(CHECKER.HUMAN, (
-            BOARD_WIDTH / 4 - CHECKER.WIDTH / 2, BOARD_HEIGHT / 3))
+        self.window.blit(CHECKER.HUMAN, (BOARD_WIDTH / 4 - CHECKER.WIDTH / 2,
+                                         BOARD_HEIGHT / g.FIELDS_IN_ROW))
         self.window.blit(CHECKER.COMPUTER, (
-            (BOARD_WIDTH / 4) * 3 - CHECKER.WIDTH / 2, BOARD_HEIGHT / 3))
+            (BOARD_WIDTH / 4) * g.FIELDS_IN_ROW - CHECKER.WIDTH / 2,
+            BOARD_HEIGHT / g.FIELDS_IN_ROW))
         pygame.display.update()
 
         position = Window.event()
@@ -190,7 +194,7 @@ class Window:
         if ERROR in [pos_width, pos_height]:
             return ERROR
 
-        num_pos = int(3 * pos_height + pos_width)
+        num_pos = int(g.FIELDS_IN_ROW * pos_height + pos_width)
 
         return num_pos
 
@@ -202,8 +206,10 @@ class Window:
         :return: współrzędne lewego górnego rogu pola planszy w oknie gry.
         """
 
-        pos_width = int(num % 3) * int(BOARD_HEIGHT // 3)
-        pos_height = int(num // 3) * int(BOARD_HEIGHT // 3)
+        pos_width = int(
+            (num % g.FIELDS_IN_ROW) *(BOARD_HEIGHT // g.FIELDS_IN_ROW))
+        pos_height = int(
+            (num // g.FIELDS_IN_ROW) * (BOARD_HEIGHT // g.FIELDS_IN_ROW))
 
         return pos_width, pos_height
 
@@ -217,10 +223,10 @@ class Window:
         """
 
         num = ERROR
-        if 0 <= pos <= size / 3:
+        if 0 <= pos <= size / g.FIELDS_IN_ROW:
             num = 0
-        elif size / 3 < pos <= (size * 2) / 3:
+        elif size / g.FIELDS_IN_ROW < pos <= (size * 2) / g.FIELDS_IN_ROW:
             num = 1
-        elif (size * 2) / 3 < pos <= size:
+        elif (size * 2) / g.FIELDS_IN_ROW < pos <= size:
             num = 2
         return num

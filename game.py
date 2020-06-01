@@ -19,6 +19,20 @@ MAX_WAITING_SEC = 5
 WIN_SCORE = 100
 LOSE_SCORE = -100
 INFINITY = 10000
+FIELDS_IN_ROW = 3
+FIELDS_IN_BOARD = 9
+
+
+class Waiting:
+    """Zapisuje czasy oczekiwania."""
+
+    # pylint: disable=too-few-public-methods
+    def __init__(self):
+        """Inicjalizuje zerami wartości oczekiwania."""
+        self.expected = 0  # oczekiwany przyszły czas oczekiwania
+        self.all = 0  # sumaryczny czas oczekiwania
+        self.current = 0  # aktualny (ostatni) czas oczekiwania
+        self.previous = 0  # poprzedni czas oczekiwania
 
 
 class Game:
@@ -33,9 +47,10 @@ class Game:
     def print_board(self):
         """Rysuje planszę w konsoli."""
 
-        for i in range(3):
-            print(f' {self.board[3 * i]} | {self.board[1 + 3 * i]} | '
-                  f'{self.board[2 + 3 * i]}')
+        for i in range(FIELDS_IN_ROW):
+            print(f' {self.board[FIELDS_IN_ROW * i]} | '
+                  f'{self.board[1 + FIELDS_IN_ROW * i]} | '
+                  f'{self.board[2 + FIELDS_IN_ROW * i]}')
             if i < 2:
                 print('---+---+---')
 
@@ -51,14 +66,14 @@ class Game:
 
         print('Gracz')
 
-        if Game.count_checkers(self.board, HUMAN) >= 3:
+        if Game.count_checkers(self.board, HUMAN) >= FIELDS_IN_ROW:
             Game.remove_checker(self.board, position)
             return
 
         if Game.add_checker(self.board, position) == ERROR:
             return
 
-        for i in range(0, 9):
+        for i in range(0, FIELDS_IN_BOARD):
             if self.board[i] == 'r':
                 self.board[i] = EMPTY
                 break
@@ -121,25 +136,26 @@ class Game:
         depth = 0
         best_score = -INFINITY
         best_remove_pos = best_add_pos = -1
-        waiting = {'expexted': 0, 'all': 0, 'current': 0, 'previous': 0}
+        waiting = Waiting()
 
         # tablica do sprawdzania kolejnych ustawień pionków
         copy_board = self.board[:]
 
-        if Game.count_checkers(copy_board, COMPUTER) >= 3:
+        if Game.count_checkers(copy_board, COMPUTER) >= FIELDS_IN_ROW:
             # usuwa pionek i przestawia go w inne miejsce
-            while waiting['all'] + waiting['expexted'] < MAX_WAITING_SEC \
-                    and best_score < WIN_SCORE:
+            while (waiting.all + waiting.expected < MAX_WAITING_SEC
+                   and best_score < WIN_SCORE):
 
-                waiting['previous'] = waiting['current']
-                waiting['current'] = time.time()
+                waiting.previous = waiting.current
+                waiting.current = time.time()
 
-                for remove_pos in [pos for pos in range(9) if
+                for remove_pos in [pos for pos in range(FIELDS_IN_BOARD) if
                                    copy_board[pos] == COMPUTER]:
                     copy_board[remove_pos] = EMPTY
 
-                    empty_positions = [pos for pos in range(9) if copy_board[
-                        pos] == EMPTY and pos != remove_pos]
+                    empty_positions = [pos for pos in range(FIELDS_IN_BOARD) if
+                                       (copy_board[pos] == EMPTY
+                                        and pos != remove_pos)]
                     for add_pos in random.sample(empty_positions,
                                                  len(empty_positions)):
                         copy_board[add_pos] = COMPUTER
@@ -151,10 +167,10 @@ class Game:
                         copy_board[add_pos] = EMPTY
                     copy_board[remove_pos] = COMPUTER
 
-                waiting['current'] = time.time() - waiting['current']
-                waiting['all'] += waiting['current']
-                waiting['expexted'] = Game.waiting_evaluate(waiting['previous'],
-                                                            waiting['current'])
+                waiting.current = time.time() - waiting.current
+                waiting.all += waiting.current
+                waiting.expected = Game.waiting_evaluate(waiting.previous,
+                                                         waiting.current)
 
                 depth += 1
             self.board[best_remove_pos] = EMPTY
@@ -162,12 +178,12 @@ class Game:
 
         else:
             # tylko dodaje pionek
-            while waiting['all'] + waiting['expexted'] < MAX_WAITING_SEC \
-                    and best_score < WIN_SCORE:
+            while (waiting.all + waiting.expected < MAX_WAITING_SEC
+                   and best_score < WIN_SCORE):
 
-                waiting['previous'] = waiting['current']
-                waiting['current'] = time.time()
-                empty_positions = [pos for pos in range(9) if
+                waiting.previous = waiting.current
+                waiting.current = time.time()
+                empty_positions = [pos for pos in range(FIELDS_IN_BOARD) if
                                    copy_board[pos] == EMPTY]
                 for add_pos in random.sample(empty_positions,
                                              len(empty_positions)):
@@ -178,14 +194,16 @@ class Game:
                         best_add_pos = add_pos
                     copy_board[add_pos] = EMPTY
 
-                waiting['current'] = time.time() - waiting['current']
-                waiting['all'] += waiting['current']
-                waiting['expexted'] = Game.waiting_evaluate(waiting['previous'],
-                                                            waiting['current'])
+                waiting.current = time.time() - waiting.current
+                waiting.all += waiting.current
+                waiting.expected = Game.waiting_evaluate(waiting.previous,
+                                                         waiting.current)
 
                 depth += 1
 
             self.board[best_add_pos] = COMPUTER
+
+        del waiting
 
         print(f'Głębokość = {depth}')
         self.print_board()
@@ -232,8 +250,8 @@ class Game:
         else:
             evaluation = INFINITY
 
-        if Game.count_checkers(board, next_player) >= 3:
-            for remove_pos in [pos for pos in range(9) if
+        if Game.count_checkers(board, next_player) >= FIELDS_IN_ROW:
+            for remove_pos in [pos for pos in range(FIELDS_IN_BOARD) if
                                board[pos] == next_player]:
                 board[remove_pos] = EMPTY
                 evaluation = Game.minimax_add(depth, board, next_player,
@@ -255,7 +273,7 @@ class Game:
         :return: uaktualniona ocena ruchu.
         """
 
-        for add_pos in [pos for pos in range(9) if
+        for add_pos in [pos for pos in range(FIELDS_IN_BOARD) if
                         board[pos] == EMPTY and pos != remove_pos]:
             board[add_pos] = next_player
             if next_player == COMPUTER:
@@ -297,7 +315,7 @@ class Game:
         """
 
         number_of_checkers = 0
-        for i in range(0, 9):
+        for i in range(0, FIELDS_IN_BOARD):
             if board[i] == checker:
                 number_of_checkers += 1
         return number_of_checkers
@@ -325,8 +343,8 @@ class Game:
         :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
         """
 
-        for i in range(0, 3):
-            if board[i] == board[3 + i] == board[6 + i] != EMPTY:
+        for i in range(0, FIELDS_IN_ROW):
+            if board[i] == board[FIELDS_IN_ROW + i] == board[6 + i] != EMPTY:
                 return board[i]
         return NO_WINNER
 
@@ -338,9 +356,10 @@ class Game:
         :return: zwycięzca - ktoś wygrał, NO_WINNER - brak wygranej.
         """
 
-        for i in range(0, 3):
-            if board[3 * i] == board[1 + 3 * i] == board[2 + 3 * i] != EMPTY:
-                return board[3 * i]
+        for i in range(0, FIELDS_IN_ROW):
+            if board[FIELDS_IN_ROW * i] == board[1 + FIELDS_IN_ROW * i] == \
+                    board[2 + FIELDS_IN_ROW * i] != EMPTY:
+                return board[FIELDS_IN_ROW * i]
         return NO_WINNER
 
     @staticmethod
