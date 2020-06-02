@@ -15,7 +15,7 @@ NO_WINNER = -1
 ERROR = -1
 SUCCESS = 'SUCCESS'
 
-MAX_WAITING_SEC = 5
+MAX_WAITING_SEC = 0.001
 WIN_SCORE = 100
 LOSE_SCORE = -100
 INFINITY = 10000
@@ -156,8 +156,8 @@ class Game:
                     empty_positions = [pos for pos in range(FIELDS_IN_BOARD) if
                                        (copy_board[pos] == EMPTY
                                         and pos != remove_pos)]
-                    for add_pos in random.sample(empty_positions,
-                                                 len(empty_positions)):
+                    random.shuffle(empty_positions)
+                    for add_pos in empty_positions:
                         copy_board[add_pos] = COMPUTER
                         score = Game.minimax(depth, copy_board, HUMAN) + depth
                         if score > best_score:
@@ -185,8 +185,8 @@ class Game:
                 waiting.current = time.time()
                 empty_positions = [pos for pos in range(FIELDS_IN_BOARD) if
                                    copy_board[pos] == EMPTY]
-                for add_pos in random.sample(empty_positions,
-                                             len(empty_positions)):
+                random.shuffle(empty_positions)
+                for add_pos in empty_positions:
                     copy_board[add_pos] = COMPUTER
                     score = Game.minimax(depth, copy_board, HUMAN) + depth
                     if score > best_score:
@@ -208,8 +208,7 @@ class Game:
         print(f'Głębokość = {depth}')
         self.print_board()
 
-        win = Game.check_winner(self.board)
-        if win != NO_WINNER:
+        if Game.check_winner(self.board) != NO_WINNER:
             self.current_player = COMPUTER_WIN
             print('Wygrywa komputer!')
             return

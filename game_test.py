@@ -42,9 +42,10 @@ class MinimaxTest(unittest.TestCase):
         self.game.computers_move()
         self.assertIn(self.game.board, ([1, ' ', 0,
                                          0, 1, ' ',
-                                         0, ' ', 1], [' ', 1, 0,
-                                                      0, 1, ' ',
-                                                      0, 1, ' ']))
+                                         0, ' ', 1],
+                                        [' ', 1, 0,
+                                         0, 1, ' ',
+                                         0, 1, ' ']))
         self.assertEqual(self.game.current_player, game.COMPUTER_WIN)
 
     def test_computer_lose_column(self):
@@ -77,9 +78,10 @@ class MinimaxTest(unittest.TestCase):
         self.game.computers_move()
         self.assertIn(self.game.board, ([0, 1, ' ',
                                          ' ', 0, 1,
-                                         ' ', 0, 1], [0, 1, ' ',
-                                                      1, 0, ' ',
-                                                      ' ', 0, 1]))
+                                         ' ', 0, 1],
+                                        [0, 1, ' ',
+                                         1, 0, ' ',
+                                         ' ', 0, 1]))
         self.assertEqual(self.game.current_player, game.HUMAN)
 
     def test_evaluate(self):

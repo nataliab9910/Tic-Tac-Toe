@@ -38,8 +38,9 @@ class COLORS:
     """Paleta barw."""
 
     # pylint: disable=too-few-public-methods
-    SALMON = pygame.Color("salmon")
-    BLACK = pygame.Color("black")
+    BACKGROUND_COLOR = pygame.Color("salmon")
+    TEXT_COLOR = pygame.Color("black")
+    LINES_COLOR = pygame.Color("gray20")
 
 
 class FONT:
@@ -82,11 +83,11 @@ class Window:
             if self.game.current_player == g.COMPUTER_WIN:
                 self.show_text(' Wygrywa komputer! ', FONT.BIG,
                                (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2)),
-                               (COLORS.SALMON, COLORS.BLACK))
+                               (COLORS.BACKGROUND_COLOR, COLORS.TEXT_COLOR))
             elif self.game.current_player == g.HUMAN_WIN:
                 self.show_text(' Wygrywasz! Gratulacje! ', FONT.BIG,
                                (int(BOARD_WIDTH // 2), int(BOARD_WIDTH // 2)),
-                               (COLORS.SALMON, COLORS.BLACK))
+                               (COLORS.BACKGROUND_COLOR, COLORS.TEXT_COLOR))
             pygame.display.update()
 
             if self.game.current_player not in (g.COMPUTER, g.HUMAN):
@@ -98,10 +99,10 @@ class Window:
     def draw_board(self):
         """Rysuje planszę do gry."""
 
-        self.window.fill(COLORS.SALMON)
+        self.window.fill(COLORS.BACKGROUND_COLOR)
 
         for line in LINES:
-            pygame.draw.line(self.window, COLORS.BLACK, line[0], line[1],
+            pygame.draw.line(self.window, COLORS.LINES_COLOR, line[0], line[1],
                              LINE_WIDTH)
 
         for pos in range(g.FIELDS_IN_BOARD):
@@ -126,7 +127,7 @@ class Window:
     def first_player(self):
         """Tworzy widok wyboru, kto zaczyna grę i ustawia pierwszego gracza."""
 
-        self.window.fill(COLORS.SALMON)
+        self.window.fill(COLORS.BACKGROUND_COLOR)
 
         self.show_text('Kto zaczyna?', FONT.LARGE,
                        (BOARD_WIDTH / 2, (BOARD_HEIGHT + TEXT_AREA_HEIGHT) / 5))
@@ -151,7 +152,7 @@ class Window:
             self.game.current_player = g.COMPUTER
 
     def show_text(self, text, size, position,
-                  colors=(COLORS.BLACK, COLORS.SALMON)):
+                  colors=(COLORS.TEXT_COLOR, COLORS.BACKGROUND_COLOR)):
         """Wypisuje tekst w oknie gry.
 
         :param text: tekst do wypisania,
